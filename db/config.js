@@ -1,7 +1,7 @@
 // 本地数据库配置
 const localConfig = {
   base: {
-    database: 'virtual_device',
+    database: 'bili_room',
     username: 'root',
     password: '123456',
     host: 'localhost',
@@ -38,5 +38,5 @@ const onlineConfig = {
   },
 };
 
-// module.exports = localConfig;
-module.exports = onlineConfig;
+module.exports = localConfig;
+// module.exports = onlineConfig;

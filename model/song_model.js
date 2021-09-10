@@ -3,7 +3,7 @@ const sequelize = require('../db/conn_base');
 
 // 设备表
 const Song = sequelize.define(
-  'virtual_charge',
+  'room_song',
   {
     id: {
       allowNull: false,
@@ -15,19 +15,20 @@ const Song = sequelize.define(
       // 0:被删除，1:未被删除
       type: Sequelize.BOOLEAN,
       allowNull: false,
+      defaultValue: 1,
     },
     uid: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    user: {
+    username: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    name: { type: Sequelize.STRING, allowNull: false },
-    time: { type: Sequelize.STRING, allowNull: false },
+    song_title: { type: Sequelize.STRING, allowNull: false },
+    choose_time: { type: Sequelize.BIGINT, allowNull: false },
     // uuid: { type: Sequelize.STRING, allowNull: true },
-    roomId: { type: Sequelize.STRING, allowNull: true },
+    room_id: { type: Sequelize.STRING, allowNull: true },
   },
   {
     freezeTableName: true, // 默认为false，true使用自定义的表名，不自动添加 "s"
@@ -38,7 +39,7 @@ const Song = sequelize.define(
 );
 
 // 单表同步
-Charge.sync({ force: false });
-// Charge.sync({ force: true }); // 强制同步，当数据库中已存在表时，先删除表后创建。
+Song.sync({ force: false });
+// Song.sync({ force: true }); // 强制同步，当数据库中已存在表时，先删除表后创建。
 
-module.exports = { Charge };
+module.exports = { Song };
