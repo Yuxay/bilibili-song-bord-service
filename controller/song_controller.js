@@ -6,7 +6,6 @@ module.exports = {
   /** 新增点歌数据 */
   createSong: async (ctx, next) => {
     let songInfo = ctx.request.body;
-
     let canUid = await judgeUid(songInfo);
     let canSongTitle = await judgeSongTitle(songInfo);
     console.log('canUid: ', canUid);
@@ -66,8 +65,28 @@ module.exports = {
         };
       });
   },
+  /** 修改点歌数据 */
+  updateSong: async (ctx, next) => {
+    let songInfo = ctx.request.body;
+    let id = songInfo.id;
+    await SongService.updateSongService(id, songInfo)
+      .then((result) => {
+        console.log('result: ', result);
+        ctx.body = {
+          code: 0,
+          msg: 'success',
+        };
+      })
+      .catch((err) => {
+        ctx.body = {
+          code: 500,
+          msg: err.message,
+        };
+      });
+  },
 };
 
+/** 判断用户是否可以点歌 */
 async function judgeUid(songInfo) {
   let roomId = songInfo.roomId;
   let uid = songInfo.uid;
@@ -99,6 +118,7 @@ async function judgeUid(songInfo) {
   return canUid;
 }
 
+/** 判断歌曲是否已经被点过 */
 async function judgeSongTitle(songInfo) {
   let roomId = songInfo.roomId;
   let songTitle = songInfo.songTitle;
@@ -128,6 +148,7 @@ async function judgeSongTitle(songInfo) {
   return canSongTitle;
 }
 
+/** 获取房间的配置信息 */
 async function getRoomConfig(songInfo) {
   let filterObj = { room_id: songInfo.roomId };
   let resObj = {};
