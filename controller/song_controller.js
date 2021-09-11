@@ -6,10 +6,12 @@ module.exports = {
   /** 新增点歌数据 */
   createSong: async (ctx, next) => {
     let songInfo = ctx.request.body;
+    console.log('新增点歌请求参数: ', songInfo);
     let canUid = await judgeUid(songInfo);
+    console.log('用户是否可点: ', canUid);
     let canSongTitle = await judgeSongTitle(songInfo);
-    console.log('canUid: ', canUid);
-    console.log('canSongTitle: ', canSongTitle);
+    console.log('歌曲是否可点: ', canSongTitle);
+
     let addObj = {};
     addObj.song_title = !utils.isEmpty(songInfo.songTitle) ? songInfo.songTitle : null;
     addObj.username = !utils.isEmpty(songInfo.username) ? songInfo.username : null;
@@ -50,6 +52,7 @@ module.exports = {
   /** 获取点歌列表数据 */
   getSongList: async (ctx, next) => {
     let selectKey = ctx.request.body;
+    console.log('点歌列表请求参数: ', selectKey);
     await SongService.getSongListFilter(selectKey)
       .then((data) => {
         ctx.write({
@@ -68,10 +71,28 @@ module.exports = {
   /** 修改点歌数据 */
   updateSong: async (ctx, next) => {
     let songInfo = ctx.request.body;
+    console.log('修改点歌请求参数: ', songInfo);
     let id = songInfo.id;
     await SongService.updateSongService(id, songInfo)
       .then((result) => {
-        console.log('result: ', result);
+        ctx.body = {
+          code: 0,
+          msg: 'success',
+        };
+      })
+      .catch((err) => {
+        ctx.body = {
+          code: 500,
+          msg: err.message,
+        };
+      });
+  },
+  /** 删除点歌数据 */
+  deleteSongItem: async (ctx, next) => {
+    let id = ctx.request.body.id;
+    let reqObj = { deleted: 0 };
+    await SongService.updateSongService(id, reqObj)
+      .then((result) => {
         ctx.body = {
           code: 0,
           msg: 'success',
@@ -93,15 +114,15 @@ async function judgeUid(songInfo) {
   let nowChooseTime = songInfo.chooseTime;
   let canUid = false;
   let roomInfo = await getRoomConfig(songInfo);
-  let userCd = roomInfo.userCd;
-  console.log('roomInfo: ', roomInfo);
+  let userCd = roomInfo.user_cd;
+
   await SongService.getSongListFilter({ uid: uid, roomId: roomId })
     .then((result) => {
       if (utils.isEmpty(result)) {
         canUid = true;
       } else {
-        console.log('uidRes: ', result);
-        let latestInfo = result[0];
+        let latestInfoArr = result.slice(-1);
+        let latestInfo = latestInfoArr[0];
         let latestTime = latestInfo.choose_time;
         let timeDifference = utils.SubFun(nowChooseTime, latestTime);
         let resDifference = utils.DivFun(timeDifference, 60000);
@@ -130,7 +151,6 @@ async function judgeSongTitle(songInfo) {
       if (utils.isEmpty(result)) {
         canSongTitle = true;
       } else {
-        console.log('songTitleRes: ', result);
         let latestInfo = result[0];
         let latestTime = latestInfo.choose_time;
         let timeDifference = utils.SubFun(nowChooseTime, latestTime);
@@ -150,7 +170,8 @@ async function judgeSongTitle(songInfo) {
 
 /** 获取房间的配置信息 */
 async function getRoomConfig(songInfo) {
-  let filterObj = { room_id: songInfo.roomId };
+  let filterObj = { roomId: songInfo.roomId };
+  console.log('filterObj: ', filterObj);
   let resObj = {};
   await ConfigService.getConfigInfoService(filterObj)
     .then((result) => {

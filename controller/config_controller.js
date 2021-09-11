@@ -36,7 +36,8 @@ module.exports = {
   },
   /** 获取直播间配置 */
   getConfigInfo: async (ctx, next) => {
-    let selectKey = ctx.request.body;
+    let selectKey = ctx.request.query;
+    console.log('selectKey: ', selectKey);
     await ConfigService.getConfigInfoService(selectKey)
       .then((data) => {
         console.log('data: ', data);

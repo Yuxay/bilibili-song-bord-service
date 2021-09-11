@@ -10,15 +10,17 @@ class ChargeService {
   }
   /** 获取点歌信息 */
   async getSongListFilter(filterObj) {
-    let selectObj = { deleted: 1 };
+    let selectObj = {};
+    filterObj.deleted && !utils.isEmpty(filterObj.deleted) ? (selectObj['deleted'] = filterObj.deleted) : (selectObj = selectObj);
     filterObj.chooseTime && !utils.isEmpty(filterObj.chooseTime) ? (selectObj['choose_time'] = { [Op.gte]: filterObj.chooseTime }) : (selectObj = selectObj);
     // filterObj.chooseTime && !utils.isEmpty(filterObj.chooseTime) ? (selectObj['choose_time'] = filterObj.chooseTime) : selectObj;
     filterObj.roomId && !utils.isEmpty(filterObj.roomId) ? (selectObj['room_id'] = filterObj.roomId) : selectObj;
     filterObj.uid && !utils.isEmpty(filterObj.uid) ? (selectObj['uid'] = filterObj.uid) : selectObj;
     filterObj.songTitle && !utils.isEmpty(filterObj.songTitle) ? (selectObj['song_title'] = filterObj.songTitle) : selectObj;
-    console.log('selectObj: ', selectObj);
+    console.log('service层获取点歌信息请求参数: ', selectObj);
     return Song.findAll({
-      order: [['createdAt', 'DESC']],
+      // ASC: 升序  DESC: 降序
+      order: [['createdAt', 'ASC']],
       where: selectObj,
       raw: true,
     });
