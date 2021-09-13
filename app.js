@@ -37,8 +37,8 @@ app.use(sslify()); // 使用ssl
 // 路径为证书放置的位置
 
 const options = {
-  key: fs.readFileSync('./private_key.pem'), //私钥文件路径
-  cert: fs.readFileSync('./ca-cert.pem'), //证书文件路径
+  key: fs.readFileSync('./www.yuxay.cn.key'), //私钥文件路径
+  cert: fs.readFileSync('./www.yuxay.cn.pem'), //证书文件路径
 };
 
 // config.port为自定义端口
