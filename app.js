@@ -1,4 +1,10 @@
 const Koa = require('koa');
+
+// 引入https 以及 koa-ssl
+const https = require('https');
+const sslify = require('koa-sslify').default;
+const fs = require('fs');
+
 const app = new Koa();
 const bodyParser = require('koa-bodyparser');
 const cors = require('koa2-cors');
@@ -26,6 +32,25 @@ app.on('error', (err, ctx) => console.error('server error', err));
 
 app.use(cors());
 
-app.listen(3001, () => {
-  console.log('Server is running!');
+app.use(sslify()); // 使用ssl
+
+// 路径为证书放置的位置
+
+const options = {
+  key: fs.readFileSync('./private_key.pem'), //私钥文件路径
+  cert: fs.readFileSync('./ca-cert.pem'), //证书文件路径
+};
+
+// config.port为自定义端口
+
+https.createServer(options, app.callback()).listen(3001, (err) => {
+  if (err) {
+    console.log('服务启动出错', err);
+  } else {
+    console.log('Server is running in 3001!');
+  }
 });
+
+// app.listen(3001, () => {
+//   console.log('Server is running!');
+// });
