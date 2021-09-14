@@ -1,6 +1,14 @@
 const utils = require('../utils');
 const SongService = require('../service/song_service');
 const ConfigService = require('../service/config_service');
+const axios = require('axios');
+const instance = axios.create({
+  baseURL: 'https://api.live.bilibili.com/',
+  timeout: 1000000,
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8',
+  },
+});
 
 module.exports = {
   /** 新增点歌数据 */
@@ -53,6 +61,9 @@ module.exports = {
   getSongList: async (ctx, next) => {
     let selectKey = ctx.request.body;
     console.log('点歌列表请求参数: ', selectKey);
+    let roomId = selectKey.roomId;
+    let chooseTime = getRoomLiveInfo(roomId);
+    selectKey.chooseTime = chooseTime;
     await SongService.getSongListFilter(selectKey)
       .then((data) => {
         ctx.write({
@@ -181,4 +192,21 @@ async function getRoomConfig(songInfo) {
       resObj = {};
     });
   return resObj;
+}
+
+/** 获取直播间开播信息 */
+function getRoomLiveInfo(roomId) {
+  let liveTime = 0;
+  instance
+    .get('/room/v1/Room/get_info?device=phone&;platform=ios&scale=3&build=10000&room_id=' + roomId)
+    .then(({ data }) => {
+      console.log('data: ', data);
+      if (data && data.code == 0) {
+        liveTime = data.data.live_time;
+      }
+    })
+    .catch((err) => {
+      console.log('err: ', err);
+    });
+  return liveTime;
 }
