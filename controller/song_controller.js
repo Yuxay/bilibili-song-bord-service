@@ -64,7 +64,7 @@ module.exports = {
     let roomId = selectKey.roomId;
     let chooseTime = getRoomLiveInfo(roomId);
     selectKey.chooseTime = chooseTime;
-    await SongService.getSongListFilter(selectKey)
+    SongService.getSongListFilter(selectKey)
       .then((data) => {
         ctx.write({
           code: 0,
