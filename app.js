@@ -1,3 +1,4 @@
+// app.js
 const Koa = require('koa');
 
 // 引入https 以及 koa-ssl
@@ -8,15 +9,29 @@ const fs = require('fs');
 const app = new Koa();
 const bodyParser = require('koa-bodyparser');
 const cors = require('koa2-cors');
-// app.js
+const cors = require('koa2-cors');
+
+app.use(
+  cors({
+    origin: function (ctx) {
+      return '*'; // 允许来自所有域名请求
+    },
+    maxAge: 5, //指定本次预检请求的有效期，单位为秒。
+    credentials: true, //是否允许发送Cookie
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], //设置所允许的HTTP请求方法'
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept'], //设置服务器支持的所有头信息字段
+    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'], //设置获取其他自定义字段
+  })
+);
 const toHump = require('./utils/toHump');
 app.use(toHump); // 需要放在引用路由之前
 const router = require('./routes');
+
 app.use(bodyParser());
 
 app.use(router.routes());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
