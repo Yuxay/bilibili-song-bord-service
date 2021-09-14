@@ -202,7 +202,9 @@ function getRoomLiveInfo(roomId) {
     .then(({ data }) => {
       console.log('data: ', data);
       if (data && data.code == 0) {
-        liveTime = data.data.live_time;
+        // liveTime = data.data.live_time;
+        let tempTime = data.data.live_time;
+        liveTime = new Date(tempTime).getTime();
       }
     })
     .catch((err) => {
