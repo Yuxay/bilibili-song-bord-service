@@ -7,7 +7,7 @@ router.get('/', async (ctx) => {
 });
 
 // 点歌相关接口
-router.post('/room/song/select', SongController.getSongList);
+router.get('/room/song/select', SongController.getSongList);
 router.post('/room/song/create', SongController.createSong);
 router.post('/room/song/update', SongController.updateSong);
 router.post('/room/song/delete', SongController.deleteSongItem);

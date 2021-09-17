@@ -59,12 +59,9 @@ module.exports = {
   },
   /** 获取点歌列表数据 */
   getSongList: async (ctx, next) => {
-    let selectKey = ctx.request.body;
+    let selectKey = ctx.request.query;
     console.log('点歌列表请求参数: ', selectKey);
-    let roomId = selectKey.roomId;
-    let chooseTime = getRoomLiveInfo(roomId);
-    selectKey.chooseTime = chooseTime;
-    SongService.getSongListFilter(selectKey)
+    await SongService.getSongListFilter(selectKey)
       .then((data) => {
         ctx.write({
           code: 0,
@@ -78,6 +75,26 @@ module.exports = {
           msg: err.message,
         };
       });
+    // let roomId = selectKey.roomId;
+    // getRoomLiveInfo(roomId);
+    // setTimeout(() => {
+    //   console.log('liveTime: ', liveTime);
+    //   selectKey.chooseTime = liveTime;
+    //   SongService.getSongListFilter(selectKey)
+    //     .then((data) => {
+    //       ctx.write({
+    //         code: 0,
+    //         msg: 'success',
+    //         data: data,
+    //       });
+    //     })
+    //     .catch((err) => {
+    //       ctx.body = {
+    //         code: 500,
+    //         msg: err.message,
+    //       };
+    //     });
+    // }, 300);
   },
   /** 修改点歌数据 */
   updateSong: async (ctx, next) => {
@@ -195,20 +212,20 @@ async function getRoomConfig(songInfo) {
 }
 
 /** 获取直播间开播信息 */
-function getRoomLiveInfo(roomId) {
-  let liveTime = 0;
-  instance
+async function getRoomLiveInfo(roomId) {
+  await instance
     .get('/room/v1/Room/get_info?device=phone&;platform=ios&scale=3&build=10000&room_id=' + roomId)
     .then(({ data }) => {
-      console.log('data: ', data);
+      console.log('code: ', data.code);
       if (data && data.code == 0) {
-        // liveTime = data.data.live_time;
+        console.log('live_time: ', data.data.live_time);
         let tempTime = data.data.live_time;
         liveTime = new Date(tempTime).getTime();
+      } else {
+        console.log('data: ', data);
       }
     })
     .catch((err) => {
       console.log('err: ', err);
     });
-  return liveTime;
 }
